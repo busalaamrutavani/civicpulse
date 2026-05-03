@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicPulse | Your 2026 Election Guide</title>
+    <meta name="description" content="An interactive assistant helping you navigate the 2026 US Midterm elections with ease.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="glass-nav">
+            <div class="logo">
+                <span class="pulse-icon"></span>
+                <h1>CivicPulse</h1>
+            </div>
+            <nav>
+                <button id="nav-dashboard" class="active">Dashboard</button>
+                <button id="nav-timeline">Timeline</button>
+                <button id="nav-resources">Resources</button>
+            </nav>
+        </header>
+
+        <main id="main-content">
+            <!-- Dynamic Content Injected Here -->
+            <section id="dashboard-view" class="view active">
+                <div class="hero-section">
+                    <h2>Welcome to the 2026 Midterms</h2>
+                    <p>Your journey to the polls starts here. Let's get you ready for November 3rd.</p>
+                    
+                    <div class="voter-power-container glass" style="max-width: 600px; margin: 2rem auto; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Your Voter Power</span>
+                            <span id="power-percent">10%</span>
+                        </div>
+                        <div class="progress-bg" style="background: rgba(255,255,255,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
+                            <div id="power-bar" style="width: 10%; height: 100%; background: linear-gradient(90deg, var(--accent), #ff9800); transition: width 0.8s ease-out;"></div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Complete your voting plan to hit 100% power!</p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <h3>Registration</h3>
+                        <div class="status-indicator" id="reg-status">Pending</div>
+                        <p>Deadline: Oct 5, 2026</p>
+                    </div>
+                    <div class="stat-card glass">
+                        <h3>Next Step</h3>
+                        <p id="next-step-text">Complete Voter Profile</p>
+                        <button class="btn-primary" id="start-onboarding">Start Guide</button>
+                    </div>
+                    <div class="stat-card glass">
+                        <h3>Countdown</h3>
+                        <div id="countdown-timer">--:--:--</div>
+                        <p>Until Election Day</p>
+                    </div>
+                </div>
+
+                <div class="news-feed-section glass">
+                    <h3>Election Updates</h3>
+                    <div id="news-feed" class="feed-container">
+                        <!-- Simulated News Items -->
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="timeline-view" class="view">
+                <h2>Election Roadmap 2026</h2>
+                <div id="timeline-container"></div>
+            </section>
+
+            <section id="resources-view" class="view">
+                <h2>Voting Resources</h2>
+                <div class="stats-grid" style="margin-top: 2rem;">
+                    <div class="stat-card glass">
+                        <h3>Voter Registration</h3>
+                        <p>Check your status or register online in minutes.</p>
+                        <a href="https://vote.gov" target="_blank" class="btn-primary" style="display: inline-block; text-decoration: none;">Visit Vote.gov</a>
+                    </div>
+                    <div class="stat-card glass">
+                        <h3>State Deadlines</h3>
+                        <p>Detailed rules and deadlines for all 50 states.</p>
+                        <button class="btn-primary">View Deadlines</button>
+                    </div>
+                    <div class="stat-card glass">
+                        <h3>Election FAQ</h3>
+                        <p>Common questions about IDs, polling, and mail-in ballots.</p>
+                        <button class="btn-primary">Read FAQ</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Assistant Component -->
+        <div id="assistant-container">
+            <div id="assistant-bubble" class="assistant-closed">
+                <span class="ai-avatar">CP</span>
+            </div>
+            <div id="assistant-window" class="glass hidden">
+                <div class="assistant-header">
+                    <h3>CivicPulse Assistant</h3>
+                    <button id="close-assistant">&times;</button>
+                </div>
+                <div id="chat-history"></div>
+                <div class="chat-input-area">
+                    <div id="chat-options" class="options-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
