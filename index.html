@@ -92,16 +92,37 @@
                     <div class="stat-card glass">
                         <h3>State Deadlines</h3>
                         <p>Detailed rules and deadlines for all 50 states.</p>
-                        <button class="btn-primary">View Deadlines</button>
+                        <button class="btn-primary" id="view-deadlines">View Deadlines</button>
                     </div>
                     <div class="stat-card glass">
                         <h3>Election FAQ</h3>
                         <p>Common questions about IDs, polling, and mail-in ballots.</p>
-                        <button class="btn-primary">Read FAQ</button>
+                        <button class="btn-primary" id="read-faq">Read FAQ</button>
                     </div>
                 </div>
             </section>
         </main>
+
+        <!-- Modals -->
+        <div id="deadlines-modal" class="modal">
+            <div class="modal-content glass">
+                <button class="close-modal" id="close-deadlines">&times;</button>
+                <h2>State Deadlines 2026</h2>
+                <div style="line-height:1.6;">
+                    <p><strong>California:</strong> Oct 19 (Online), Nov 3 (In-Person)</p>
+                    <p><strong>Texas:</strong> Oct 5 (In-Person/Mail)</p>
+                    <p><strong>New York:</strong> Oct 9 (Postmarked)</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="faq-modal" class="modal">
+            <div class="modal-content glass">
+                <button class="close-modal" id="close-faq">&times;</button>
+                <h2>Election FAQ</h2>
+                <p><strong>Q: What ID do I need?</strong><br>A: Most states require photo ID. Check your state portal.</p>
+            </div>
+        </div>
 
         <!-- Assistant Component -->
         <div id="assistant-container">

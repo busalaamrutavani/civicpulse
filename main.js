@@ -54,7 +54,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Countdown Timer (November 3, 2026)
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    // Modal Listeners
+    setupModals();
 });
+
+function setupModals() {
+    const modals = {
+        'view-deadlines': 'deadlines-modal',
+        'read-faq': 'faq-modal'
+    };
+
+    Object.keys(modals).forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                document.getElementById(modals[btnId]).classList.add('active');
+            });
+        }
+    });
+
+    ['close-deadlines', 'close-faq'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.remove('active');
+            });
+        }
+    });
+}
 
 function switchView(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
