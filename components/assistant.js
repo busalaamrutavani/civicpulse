@@ -9,23 +9,22 @@ const conversationTree = {
         ]
     },
     first_time: {
-        text: "Exciting! First-time voters are the backbone of democracy. Which state will you be voting in? (This helps me find your local deadlines).",
+        text: "Exciting! First-time voters are the backbone of democracy. Which state will you be voting in?",
         options: [
             { text: "California", next: "check_reg", data: { state: 'California' } },
             { text: "Texas", next: "check_reg", data: { state: 'Texas' } },
-            { text: "New York", next: "check_reg", data: { state: 'New York' } },
-            { text: "Florida", next: "check_reg", data: { state: 'Florida' } }
+            { text: "New York", next: "check_reg", data: { state: 'New York' } }
         ]
     },
     check_reg: {
-        text: "Got it! Are you registered to vote in your state?",
+        text: "Got it! Are you registered to vote in {state}?",
         options: [
             { text: "Yes", next: "issue_discovery" },
             { text: "Not sure", next: "how_to_reg" }
         ]
     },
     issue_discovery: {
-        text: "Great! What issues do you care most about in this election? (Select one to start)",
+        text: "Great! What issues do you care most about in this election?",
         options: [
             { text: "The Economy", next: "issue_info", data: { interest: 'Economy' } },
             { text: "Climate Change", next: "issue_info", data: { interest: 'Climate' } },
@@ -33,36 +32,41 @@ const conversationTree = {
         ]
     },
     issue_info: {
-        text: "Important choice. In 2026, many state races will focus on this. I've added a curated 'Voter Guide' to your resources. Ready to create your voting plan?",
+        text: "Important choice. I've added a curated 'Voter Guide' to your resources. Ready to create your voting plan?",
         options: [
             { text: "Yes, let's do it!", next: "voter_plan" }
         ]
     },
     voter_plan: {
-        text: "Your Plan: Vote in {state}, focused on {interest}. Election Day: Nov 3, 2026. I can email this to you or add it to your Google Calendar!",
+        text: "Your Plan: Vote in {state}, focused on {interest}. Election Day: Nov 3, 2026.",
         options: [
             { text: "Add to Calendar", next: "anything_else" },
             { text: "Email Me", next: "anything_else" }
         ]
     },
     experienced: {
-        text: "Welcome back! Glad to have a seasoned voter here. Do you need a refresher on the 2026 timeline or are you looking for polling places?",
+        text: "Welcome back! Do you need a refresher on the 2026 timeline or are you looking for polling places?",
         options: [
             { text: "Show me the timeline.", next: "timeline_info" },
             { text: "Find polling places.", next: "map_info" }
         ]
     },
     how_to_reg: {
-        text: "No problem! Most states allow you to register online. It takes less than 5 minutes. Would you like me to send you the link for your state?",
+        text: "No problem! You can register online in {state}. It takes less than 5 minutes.",
         options: [
-            { text: "Yes, please!", next: "state_select" },
-            { text: "Later, thanks.", next: "anything_else" }
+            { text: "Great, what's next?", next: "anything_else" }
         ]
     },
     timeline_info: {
-        text: "The 2026 Midterms are on November 3rd. Primaries happen between March and September. I've added the General Election to your dashboard roadmap!",
+        text: "The 2026 Midterms are on Nov 3rd. I've updated your dashboard roadmap!",
         options: [
-            { text: "Great, what's next?", next: "anything_else" }
+            { text: "Thanks!", next: "anything_else" }
+        ]
+    },
+    map_info: {
+        text: "Here is your nearest polling location in {state}:",
+        options: [
+            { text: "Thanks, I'm done.", next: "exit" }
         ]
     },
     anything_else: {
@@ -74,12 +78,13 @@ const conversationTree = {
         ]
     },
     exit: {
-        text: "Happy voting! I'll be here if you need more help. See you at the polls on Nov 3rd!",
+        text: "Happy voting! See you at the polls on Nov 3rd!",
         options: []
     }
 };
 
 import { showPollingMap } from './googleServices.js';
+import { updateVoterPower } from '../main.js';
 
 export function initAssistant(state) {
     appState = state;
@@ -88,20 +93,20 @@ export function initAssistant(state) {
     const closeBtn = document.getElementById('close-assistant');
     const chatHistory = document.getElementById('chat-history');
 
-    bubble.addEventListener('click', () => {
-        window.classList.toggle('hidden');
-        if (!window.classList.contains('hidden') && chatHistory.children.length === 0) {
-            startConversation();
-        }
-    });
+    if (bubble) {
+        bubble.addEventListener('click', () => {
+            window.classList.toggle('hidden');
+            if (!window.classList.contains('hidden') && chatHistory.children.length === 0) {
+                renderStep('start');
+            }
+        });
+    }
 
-    closeBtn.addEventListener('click', () => {
-        window.classList.add('hidden');
-    });
-}
-
-function startConversation() {
-    renderStep('start');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            window.classList.add('hidden');
+        });
+    }
 }
 
 function renderStep(stepKey) {
@@ -109,26 +114,19 @@ function renderStep(stepKey) {
     if (!step) return;
 
     let text = step.text;
-    // Handle Placeholders
     if (appState.user.state) text = text.replace('{state}', appState.user.state);
     if (appState.user.interests.length > 0) text = text.replace('{interest}', appState.user.interests[0]);
 
     addMessage(text, 'ai');
     speakMessage(text);
-// ...
-}
 
-function speakMessage(text) {
-    if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.1;
-        utterance.pitch = 1;
-        window.speechSynthesis.speak(utterance);
-    }
-}
     if (stepKey === 'map_info') {
         const map = showPollingMap();
         document.getElementById('chat-history').appendChild(map);
+    }
+
+    if (stepKey === 'exit') {
+        showVoterCard();
     }
 
     const optionsContainer = document.getElementById('chat-options');
@@ -141,57 +139,17 @@ function speakMessage(text) {
         btn.onclick = () => {
             addMessage(opt.text, 'user');
             
-            // Handle Data Storage
             if (opt.data) {
-                if (opt.data.state) {
-                    appState.user.state = opt.data.state;
-                    updateVoterPower(60);
-                }
-                if (opt.data.interest) {
-                    appState.user.interests.push(opt.data.interest);
-                    updateVoterPower(80);
-                }
+                if (opt.data.state) appState.user.state = opt.data.state;
+                if (opt.data.interest) appState.user.interests.push(opt.data.interest);
             }
 
-            // Handle Phase 2 actions
-            if (opt.text === 'Add to Calendar') {
-                window.openCalendar();
-                updateVoterPower(100);
-            }
-            if (opt.text === 'Email Me') {
-                simulateEmailPlan(appState);
-                updateVoterPower(100);
-            }
-            if (opt.text === 'Yes' && stepKey === 'check_reg') updateVoterPower(40);
-
-            if (opt.next === 'exit') showVoterCard();
+            if (stepKey === 'start') updateVoterPower(20);
+            if (opt.data && opt.data.state) updateVoterPower(40);
+            if (opt.data && opt.data.interest) updateVoterPower(80);
+            if (opt.next === 'exit') updateVoterPower(100);
 
             setTimeout(() => renderStep(opt.next), 600);
-// ...
-}
-
-function showVoterCard() {
-    const card = document.createElement('div');
-    card.className = 'glass';
-    card.style.padding = '1.5rem';
-    card.style.marginTop = '1rem';
-    card.style.borderLeft = '4px solid var(--accent)';
-    card.innerHTML = `
-        <h4 style="margin-bottom:0.5rem;">Digital Voter Info Card</h4>
-        <div style="font-size:0.85rem; color:var(--text-dim);">
-            <p><strong>State:</strong> ${appState.user.state || 'Not Set'}</p>
-            <p><strong>Priority:</strong> ${appState.user.interests.join(', ') || 'General'}</p>
-            <p><strong>Election Day:</strong> Nov 3, 2026</p>
-        </div>
-        <button class="btn-primary" style="margin-top:1rem; font-size:0.8rem;" onclick="window.print()">Download PDF</button>
-    `;
-    document.getElementById('chat-history').appendChild(card);
-}
-            
-            // Logic: Update state based on choices
-            if (stepKey === 'start' && opt.text.includes('Yes')) {
-                appState.user.persona = 'first-time';
-            }
         };
         optionsContainer.appendChild(btn);
     });
@@ -204,4 +162,30 @@ function addMessage(text, sender) {
     bubble.textContent = text;
     chatHistory.appendChild(bubble);
     chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function speakMessage(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function showVoterCard() {
+    const card = document.createElement('div');
+    card.className = 'glass';
+    card.style.padding = '1.5rem';
+    card.style.marginTop = '1rem';
+    card.style.borderLeft = '4px solid var(--accent)';
+    card.innerHTML = `
+        <h4 style="margin-bottom:0.5rem;">Digital Voter Info Card</h4>
+        <div style="font-size:0.85rem; color:var(--text-dim);">
+            <p><strong>State:</strong> ${appState.user.state || 'Not Set'}</p>
+            <p><strong>Focus:</strong> ${appState.user.interests.join(', ') || 'General'}</p>
+            <p><strong>Election Day:</strong> Nov 3, 2026</p>
+        </div>
+        <button class="btn-primary" style="margin-top:1rem; font-size:0.8rem;" onclick="window.print()">Download PDF</button>
+    `;
+    document.getElementById('chat-history').appendChild(card);
 }
