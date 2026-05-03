@@ -114,8 +114,18 @@ function renderStep(stepKey) {
     if (appState.user.interests.length > 0) text = text.replace('{interest}', appState.user.interests[0]);
 
     addMessage(text, 'ai');
+    speakMessage(text);
+// ...
+}
 
-    // Special logic for Maps
+function speakMessage(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.1;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    }
+}
     if (stepKey === 'map_info') {
         const map = showPollingMap();
         document.getElementById('chat-history').appendChild(map);
@@ -154,7 +164,29 @@ function renderStep(stepKey) {
             }
             if (opt.text === 'Yes' && stepKey === 'check_reg') updateVoterPower(40);
 
+            if (opt.next === 'exit') showVoterCard();
+
             setTimeout(() => renderStep(opt.next), 600);
+// ...
+}
+
+function showVoterCard() {
+    const card = document.createElement('div');
+    card.className = 'glass';
+    card.style.padding = '1.5rem';
+    card.style.marginTop = '1rem';
+    card.style.borderLeft = '4px solid var(--accent)';
+    card.innerHTML = `
+        <h4 style="margin-bottom:0.5rem;">Digital Voter Info Card</h4>
+        <div style="font-size:0.85rem; color:var(--text-dim);">
+            <p><strong>State:</strong> ${appState.user.state || 'Not Set'}</p>
+            <p><strong>Priority:</strong> ${appState.user.interests.join(', ') || 'General'}</p>
+            <p><strong>Election Day:</strong> Nov 3, 2026</p>
+        </div>
+        <button class="btn-primary" style="margin-top:1rem; font-size:0.8rem;" onclick="window.print()">Download PDF</button>
+    `;
+    document.getElementById('chat-history').appendChild(card);
+}
             
             // Logic: Update state based on choices
             if (stepKey === 'start' && opt.text.includes('Yes')) {

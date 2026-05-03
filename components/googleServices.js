@@ -77,6 +77,7 @@ export function showPollingMap(location) {
             <strong>Main Street Library</strong><br>
             123 Democracy Ave, New York, NY<br>
             <span style="color: var(--success); font-size: 0.8rem;">● Open 7AM - 8PM</span>
+            <button class="btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-top: 0.5rem; display: block;" onclick="alert('Opening Google Maps Directions...')">Get Directions</button>
         </div>
     `;
     return mapContainer;
