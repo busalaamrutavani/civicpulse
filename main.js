@@ -31,13 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById(btnId);
         if (btn) {
             btn.addEventListener('click', () => {
-                const viewId = navButtons[btnId];
-                switchView(viewId);
-                updateNavActive(btnId);
-                
-                // Refresh timeline data if entering timeline view
-                if (viewId === 'timeline-view') {
-                    initTimeline(state);
+                try {
+                    const viewId = navButtons[btnId];
+                    switchView(viewId);
+                    updateNavActive(btnId);
+                    
+                    if (viewId === 'timeline-view') {
+                        initTimeline(state);
+                    }
+                } catch (e) {
+                    console.error("Navigation error:", e);
                 }
             });
         }
@@ -85,10 +88,14 @@ function setupModals() {
 }
 
 function switchView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
     const target = document.getElementById(viewId);
     if (target) {
         target.classList.add('active');
+        target.style.display = 'block';
     }
 }
 
